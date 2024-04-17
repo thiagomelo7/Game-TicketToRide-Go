@@ -63,6 +63,18 @@ func main() {
 	log.Print(tickets)
 }
 
+var totalCards = map[color]int{
+	all:    14,
+	blue:   12,
+	red:    12,
+	green:  12,
+	yellow: 12,
+	white:  12,
+	pink:   12,
+	orange: 12,
+	black:  12,
+}
+
 type player struct {
 	tickets []ticket
 	cards   map[color]int
