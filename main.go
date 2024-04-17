@@ -36,6 +36,8 @@ type Card color
 
 var availableTrainCars int = 40
 
+type Board struct { graph.Graph[string] }
+
 func main() {
 	b, err := fillRoutes()
 	if err != nil {
@@ -159,3 +161,8 @@ type TrainLine struct {
 }
 
 func (t TrainLine) Weight() int { return t.cost }
+
+func (p *player) draw(deck map[color]int) {}
+func (p *player) build() func(Board) { return nil }
+
+func (p *player) play() func(Board) { return nil }
