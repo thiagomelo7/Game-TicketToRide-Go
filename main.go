@@ -12,13 +12,11 @@ import (
 )
 
 type Cities graph.Vertex[string]
-type RailwayLines graph.Edge[string]
-type RailwayLinesProperty struct {
+type Lines graph.Edge[string]
+type LineProperty struct {
 	Cost  int
 	Color color
 }
-
-type TicketToRideBoard graph.ArcsList[string]
 
 type color int8
 
@@ -39,8 +37,10 @@ type Card color
 var availableTrainCars int = 40
 
 func main() {
-	b := graph.New[string](graph.ArcsListType, false)
-	fillRoutes(b)
+	b, err := fillRoutes()
+	if err != nil {
+		log.Fatal(err)
+	}
 	findCity := func(name string, in graph.Graph[string]) *graph.Vertex[string] {
 		for _, v := range in.Vertices() {
 			if v.E != name {
@@ -50,21 +50,64 @@ func main() {
 		}
 		return nil
 	}
+
 	s := findCity("Chicago", b)
 	d := findCity("Miami", b)
 	dist := path.BellmanFordDist(b, s)
 	log.Print(path.Shortest[string](b, dist, s, d))
 	log.Print(dist[d])
+	tickets, err := fillTickets()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(tickets)
 }
 
-func fillRoutes(b graph.Graph[string]) error {
-	f, err := os.Open("./data/USA/routes.csv")
+type player struct {
+	tickets []ticket
+	cards   map[color]int
+}
+
+type ticket struct {
+	x, y  string
+	score int
+}
+
+func fillTickets() ([]ticket, error) {
+	f, err := os.Open("./data/USA/tickets.csv")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	var toRead bool
+	var tickets []ticket
+	for scanner.Scan() {
+		if !toRead {
+			toRead = true
+			continue
+		}
+		line := scanner.Text()
+		f := strings.Split(line, ",")
+		x, y, scoreStr := f[0], f[1], f[2]
+		score, err := strconv.Atoi(scoreStr)
+		if err != nil {
+			return nil, err
+		}
+		tickets = append(tickets, ticket{x: x, y: y, score: score})
+	}
+	return tickets, nil
+}
+
+func fillRoutes() (graph.Graph[string], error) {
+	f, err := os.Open("./data/USA/routes.csv")
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	var toRead bool
+	b := graph.New[string](graph.AdjacencyListType, false)
 	for scanner.Scan() {
 		if !toRead {
 			toRead = true
@@ -79,7 +122,7 @@ func fillRoutes(b graph.Graph[string]) error {
 		b.AddVertex(Y)
 		costN, err := strconv.Atoi(cost)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		mCol := map[string]color{
 			"X": all,
@@ -95,7 +138,7 @@ func fillRoutes(b graph.Graph[string]) error {
 		P := TrainLine{col: mCol[col], cost: costN}
 		b.AddEdge(&graph.Edge[string]{X: X, Y: Y, P: P})
 	}
-	return nil
+	return b, nil
 }
 
 type TrainLine struct {
