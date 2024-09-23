@@ -11,12 +11,16 @@ import (
 	"github.com/mcaci/graphgo/path"
 )
 
-type Cities graph.Vertex[string]
-type Lines graph.Edge[string]
-type LineProperty struct {
-	Cost  int
-	Color color
+type Board graph.Graph[City]
+type City string
+type TrainStation graph.Vertex[City]
+type TrainLine graph.Edge[City]
+type TrainLineProperty struct {
+	Distance int
+	Color    color
 }
+
+func (t TrainLineProperty) Weight() int { return t.Distance }
 
 type color int8
 
@@ -32,32 +36,26 @@ const (
 	black
 )
 
-type Card color
-
-var availableTrainCars int = 40
-
-type Board struct { graph.Graph[string] }
-
 func main() {
 	b, err := fillRoutes()
 	if err != nil {
 		log.Fatal(err)
 	}
-	findCity := func(name string, in graph.Graph[string]) *graph.Vertex[string] {
+	findCity := func(name City, in Board) *TrainStation {
 		for _, v := range in.Vertices() {
 			if v.E != name {
 				continue
 			}
-			return v
+			return (*TrainStation)(v)
 		}
 		return nil
 	}
 
 	s := findCity("Chicago", b)
 	d := findCity("Miami", b)
-	dist := path.BellmanFordDist(b, s)
-	log.Print(path.Shortest[string](b, dist, s, d))
-	log.Print(dist[d])
+	dist := path.BellmanFordDist(b, (*graph.Vertex[City])(s))
+	log.Print(path.Shortest[City](b, dist, (*graph.Vertex[City])(s), (*graph.Vertex[City])(d)))
+	log.Print(dist[(*graph.Vertex[City])(d)])
 	tickets, err := fillTickets()
 	if err != nil {
 		log.Fatal(err)
@@ -65,55 +63,7 @@ func main() {
 	log.Print(tickets)
 }
 
-var totalCards = map[color]int{
-	all:    14,
-	blue:   12,
-	red:    12,
-	green:  12,
-	yellow: 12,
-	white:  12,
-	pink:   12,
-	orange: 12,
-	black:  12,
-}
-
-type player struct {
-	tickets []ticket
-	cards   map[color]int
-}
-
-type ticket struct {
-	x, y  string
-	score int
-}
-
-func fillTickets() ([]ticket, error) {
-	f, err := os.Open("./data/USA/tickets.csv")
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	scanner := bufio.NewScanner(f)
-	var toRead bool
-	var tickets []ticket
-	for scanner.Scan() {
-		if !toRead {
-			toRead = true
-			continue
-		}
-		line := scanner.Text()
-		f := strings.Split(line, ",")
-		x, y, scoreStr := f[0], f[1], f[2]
-		score, err := strconv.Atoi(scoreStr)
-		if err != nil {
-			return nil, err
-		}
-		tickets = append(tickets, ticket{x: x, y: y, score: score})
-	}
-	return tickets, nil
-}
-
-func fillRoutes() (graph.Graph[string], error) {
+func fillRoutes() (Board, error) {
 	f, err := os.Open("./data/USA/routes.csv")
 	if err != nil {
 		return nil, err
@@ -121,7 +71,7 @@ func fillRoutes() (graph.Graph[string], error) {
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	var toRead bool
-	b := graph.New[string](graph.AdjacencyListType, false)
+	b := graph.New[City](graph.AdjacencyListType, false)
 	for scanner.Scan() {
 		if !toRead {
 			toRead = true
@@ -129,16 +79,16 @@ func fillRoutes() (graph.Graph[string], error) {
 		}
 		line := scanner.Text()
 		f := strings.Split(line, ",")
-		x, y, cost, col := f[0], f[1], f[2], f[3]
-		X := &graph.Vertex[string]{E: x}
-		Y := &graph.Vertex[string]{E: y}
+		x, y, ds, cl := f[0], f[1], f[2], f[3]
+		X := &graph.Vertex[City]{E: City(x)}
+		Y := &graph.Vertex[City]{E: City(y)}
 		b.AddVertex(X)
 		b.AddVertex(Y)
-		costN, err := strconv.Atoi(cost)
+		d, err := strconv.Atoi(ds)
 		if err != nil {
 			return nil, err
 		}
-		mCol := map[string]color{
+		m := map[string]color{
 			"X": all,
 			"B": blue,
 			"R": red,
@@ -149,20 +99,8 @@ func fillRoutes() (graph.Graph[string], error) {
 			"O": orange,
 			"K": black,
 		}
-		P := TrainLine{col: mCol[col], cost: costN}
-		b.AddEdge(&graph.Edge[string]{X: X, Y: Y, P: P})
+		E := TrainLine{X: X, Y: Y, P: TrainLineProperty{Color: m[cl], Distance: d}}
+		b.AddEdge((*graph.Edge[City])(&E))
 	}
 	return b, nil
 }
-
-type TrainLine struct {
-	col  color
-	cost int
-}
-
-func (t TrainLine) Weight() int { return t.cost }
-
-func (p *player) draw(deck map[color]int) {}
-func (p *player) build() func(Board) { return nil }
-
-func (p *player) play() func(Board) { return nil }
