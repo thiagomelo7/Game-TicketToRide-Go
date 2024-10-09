@@ -2,17 +2,13 @@ package data
 
 import (
 	"bufio"
+	"go-ticket-to-ride/pkg/game"
 	"os"
 	"strconv"
 	"strings"
 )
 
-type ticket struct {
-	X, Y  string
-	Score int
-}
-
-func Tickets() ([]ticket, error) {
+func Tickets() ([]game.Ticket, error) {
 	f, err := os.Open("./pkg/data/USA/tickets.csv")
 	if err != nil {
 		return nil, err
@@ -20,7 +16,7 @@ func Tickets() ([]ticket, error) {
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	var toRead bool
-	var tickets []ticket
+	var tickets []game.Ticket
 	for scanner.Scan() {
 		if !toRead {
 			toRead = true
@@ -33,7 +29,7 @@ func Tickets() ([]ticket, error) {
 		if err != nil {
 			return nil, err
 		}
-		tickets = append(tickets, ticket{X: x, Y: y, Score: score})
+		tickets = append(tickets, game.Ticket{X: game.City(x), Y: game.City(y), Value: score})
 	}
 	return tickets, nil
 }

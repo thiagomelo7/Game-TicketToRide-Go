@@ -52,3 +52,8 @@ var totalCards = map[Color]int{
 	Orange: 12,
 	Black:  12,
 }
+
+type Ticket struct {
+	X, Y  City
+	Value int
+}
