@@ -32,7 +32,7 @@ func main() {
 		play(b)
 		coin = !coin
 	}
-	slog.Info("end game", "Score P1", p1.Score(), "Score P2", p2.Score())
+	slog.Info("end game", "Score P1", player.Score(p1), "Score P2", player.Score(p2))
 }
 
 func initialChecks(b game.Board) {

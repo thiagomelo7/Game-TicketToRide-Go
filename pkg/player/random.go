@@ -3,6 +3,8 @@ package player
 import (
 	"go-ticket-to-ride/pkg/game"
 	"log/slog"
+
+	"github.com/mcaci/graphgo/graph"
 )
 
 type Random struct {
@@ -18,13 +20,12 @@ func (p *Random) Play() func(g game.Board) {
 		p.occupiedLines = append(p.occupiedLines, (*game.TrainLine)(chosenLine))
 		slog.Info("New Train line taken:", "Player", p.id, "Line", *chosenLine)
 		g.RemoveEdge(chosenLine)
+		// Remove edge for double route if needed
+		doubleLine := &game.TrainLine{X: chosenLine.Y, Y: chosenLine.X}
+		if g.ContainsEdge((*graph.Edge[game.City])(doubleLine)) {
+			g.RemoveEdge((*graph.Edge[game.City])(doubleLine))
+		}
 	}
 }
 
-func (p *Random) Score() int {
-	var score int
-	for i := range p.occupiedLines {
-		score += p.occupiedLines[i].P.(game.TrainLineProperty).Weight()
-	}
-	return score
-}
+func (p *Random) TrainLines() []*game.TrainLine { return p.occupiedLines }
