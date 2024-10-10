@@ -46,7 +46,7 @@ func Routes() (game.Board, error) {
 			"O": game.Orange,
 			"K": game.Black,
 		}
-		E := game.TrainLine{X: X, Y: Y, P: game.TrainLineProperty{Color: m[cl], Distance: d}}
+		E := game.TrainLine{X: X, Y: Y, P: &game.TrainLineProperty{Color: m[cl], Distance: d}}
 		b.AddEdge((*graph.Edge[game.City])(&E))
 	}
 	return b, nil

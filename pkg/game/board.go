@@ -1,6 +1,10 @@
 package game
 
-import "github.com/mcaci/graphgo/graph"
+import (
+	"strconv"
+
+	"github.com/mcaci/graphgo/graph"
+)
 
 type Board graph.Graph[City]
 type City string
@@ -9,6 +13,21 @@ type TrainLine graph.Edge[City]
 type TrainLineProperty struct {
 	Distance int
 	Color    Color
+	Occupied bool
+}
+
+func FreeRoutesBoard(b Board) Board {
+	frb := graph.New[City](graph.ArcsListType, false)
+	for _, v := range b.Vertices() {
+		frb.AddVertex(v)
+	}
+	for _, e := range b.Edges() {
+		if e.P.(*TrainLineProperty).Occupied {
+			continue
+		}
+		frb.AddEdge(e)
+	}
+	return frb
 }
 
 func FindCity(name City, in Board) *TrainStation {
@@ -21,7 +40,24 @@ func FindCity(name City, in Board) *TrainStation {
 	return nil
 }
 
+func FindLineFunc(f func(*TrainLine) bool, in Board) *TrainLine {
+	for _, e := range in.Edges() {
+		tl := (*TrainLine)(e)
+		if !f(tl) {
+			continue
+		}
+		return tl
+	}
+	return nil
+}
+
+func (t TrainLine) String() string {
+	return string(t.X.E) + " -> " + strconv.Itoa(t.P.(*TrainLineProperty).Distance) + " -> " + string(t.Y.E)
+}
+
 func (t TrainLineProperty) Weight() int { return t.Distance }
+func (t *TrainLineProperty) Occupy()    { t.Occupied = true }
+func (t *TrainLineProperty) Free()      { t.Occupied = false }
 
 type Color int8
 

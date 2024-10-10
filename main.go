@@ -16,12 +16,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	initialChecks(b)
+	tickets, err := data.Tickets()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	p1, p2 := player.NewRandom(1), player.NewRandom(2)
-	var coin bool
+	p1, p2 := player.NewAware(1, tickets[0]), player.NewRandom(2)
+	coin := true
 	// careful as some lines are double so they shouold be counted as one
-	for len(b.Edges()) > 0 {
+	for game.FindLineFunc(func(tl *game.TrainLine) bool {
+		return !tl.P.(*game.TrainLineProperty).Occupied
+	}, b) != nil {
 		var play func(game.Board)
 		switch coin {
 		case true:
@@ -33,17 +38,23 @@ func main() {
 		coin = !coin
 	}
 	slog.Info("end game", "Score P1", player.Score(p1), "Score P2", player.Score(p2))
+
+	// initialChecks(b)
 }
 
 func initialChecks(b game.Board) {
-	s := game.FindCity("Chicago", b)
-	d := game.FindCity("Miami", b)
+	s := game.FindCity("Los Angeles", b)
+	d := game.FindCity("New York", b)
 	dist := path.BellmanFordDist(b, (*graph.Vertex[game.City])(s))
-	log.Print(path.Shortest[game.City](b, dist, (*graph.Vertex[game.City])(s), (*graph.Vertex[game.City])(d)))
-	log.Print(dist[(*graph.Vertex[game.City])(d)])
-	tickets, err := data.Tickets()
-	if err != nil {
-		log.Fatal(err)
+	log.Print(path.Shortest(b, dist, (*graph.Vertex[game.City])(s), (*graph.Vertex[game.City])(d)))
+	for _, e := range b.Edges() {
+		e.P.(*game.TrainLineProperty).Free()
 	}
-	log.Print(tickets)
+	l := game.FindLineFunc(func(tl *game.TrainLine) bool {
+		return tl.X.E == "Santa Fe" && tl.Y.E == "Phoenix" || tl.X.E == "Phoenix" && tl.Y.E == "Santa Fe"
+	}, b)
+	l.P.(*game.TrainLineProperty).Occupy()
+	nb := game.FreeRoutesBoard(b)
+	ndist := path.BellmanFordDist(nb, (*graph.Vertex[game.City])(s))
+	log.Print(path.Shortest(nb, ndist, (*graph.Vertex[game.City])(s), (*graph.Vertex[game.City])(d)))
 }
