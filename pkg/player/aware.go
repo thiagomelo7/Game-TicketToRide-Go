@@ -6,6 +6,7 @@ import (
 
 	"github.com/mcaci/graphgo/graph"
 	"github.com/mcaci/graphgo/path"
+	"github.com/mcaci/graphgo/visit"
 )
 
 type Aware struct {
@@ -26,6 +27,28 @@ func (p *Aware) Play() func(game.Board) {
 		}
 		for _, e := range b.Edges() {
 			localBoard.AddEdge(e)
+		}
+		if p.ticket.Done {
+			chosenLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
+				return !tl.P.(*game.TrainLineProperty).Occupied
+			}, b)
+			if chosenLine == nil {
+				return
+			}
+			p.occupiedLines.AddEdge((*graph.Edge[game.City])(chosenLine))
+			chosenLine.P.(*game.TrainLineProperty).Occupy()
+			slog.Info("New Train line taken:", "Player", p.id, "Line", chosenLine)
+			// Remove edge for double route if needed
+			doubleLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
+				return tl.X.E == chosenLine.X.E &&
+					tl.Y.E == chosenLine.Y.E &&
+					!tl.P.(*game.TrainLineProperty).Occupied
+			}, b)
+			if doubleLine == nil {
+				return
+			}
+			doubleLine.P.(*game.TrainLineProperty).Occupy()
+			return
 		}
 	updatedBoard:
 		for len(localBoard.Edges()) > 0 {
@@ -57,6 +80,11 @@ func (p *Aware) Play() func(game.Board) {
 				}, localBoard)
 				if doubleLine != nil {
 					doubleLine.P.(*game.TrainLineProperty).Occupy()
+				}
+				// Check if ticket is done after taking the line (TODO: fix)
+				ep := visit.ExistsPath(p.occupiedLines, (*graph.Vertex[game.City])(tX), (*graph.Vertex[game.City])(tY))
+				if ep {
+					p.ticket.Done = true
 				}
 				return
 			}

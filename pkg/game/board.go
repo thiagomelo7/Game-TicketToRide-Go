@@ -92,4 +92,5 @@ var totalCards = map[Color]int{
 type Ticket struct {
 	X, Y  City
 	Value int
+	Done  bool
 }

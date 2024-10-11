@@ -1,2 +1,4 @@
 github.com/mcaci/graphgo v0.0.0-20240928082344-073486d0fef3 h1:L3sIqiYPAIBpKKSgxh0x492wIP7HAsjd5pPKNc38PGw=
 github.com/mcaci/graphgo v0.0.0-20240928082344-073486d0fef3/go.mod h1:8krsaraJhjISe7Dr3Jg9cZRme6j9VeUcpoVkHsec93U=
+github.com/mcaci/graphgo v0.0.1 h1:f4nLlKkFoLjQ/6VEWDS7gUOwNJwNGBuT8Q0ZPeEJbsY=
+github.com/mcaci/graphgo v0.0.1/go.mod h1:8krsaraJhjISe7Dr3Jg9cZRme6j9VeUcpoVkHsec93U=
