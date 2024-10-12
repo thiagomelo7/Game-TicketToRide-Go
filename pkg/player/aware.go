@@ -21,14 +21,9 @@ func NewAware(id int, t game.Ticket) *Aware {
 
 func (p *Aware) Play() func(game.Board) {
 	return func(b game.Board) {
-		localBoard := graph.New[game.City](graph.ArcsListType, false)
-		for _, v := range b.Vertices() {
-			localBoard.AddVertex(v)
-		}
-		for _, e := range b.Edges() {
-			localBoard.AddEdge(e)
-		}
-		if p.ticket.Done {
+		localBoard := graph.Copy[game.City](b)
+		switch p.ticket.Done {
+case true:
 			chosenLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
 				return !tl.P.(*game.TrainLineProperty).Occupied
 			}, b)
@@ -49,7 +44,7 @@ func (p *Aware) Play() func(game.Board) {
 			}
 			doubleLine.P.(*game.TrainLineProperty).Occupy()
 			return
-		}
+case false:
 	updatedBoard:
 		for len(localBoard.Edges()) > 0 {
 			tX, tY := game.FindCity(p.ticket.X, localBoard), game.FindCity(p.ticket.Y, localBoard)
