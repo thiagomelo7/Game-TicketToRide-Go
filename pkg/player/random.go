@@ -7,41 +7,33 @@ import (
 	"github.com/mcaci/graphgo/graph"
 )
 
-type Random struct {
+type RandomPlayer struct {
 	id            int
-	occupiedLines []*game.TrainLine
+	occupiedLines game.Board
 }
 
-func NewRandom(id int) *Random { return &Random{id: id} }
+func NewRandom(id int) *RandomPlayer { return &RandomPlayer{id: id} }
 
-func (p *Random) Play() func(game.Board) {
-	return func(g game.Board) {
-		chosenLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
-			return !tl.P.(*game.TrainLineProperty).Occupied
-		}, g)
-		if chosenLine == nil {
+func (p *RandomPlayer) Play() func(game.Board) {
+	return func(b game.Board) {
+		localBoard := graph.Copy(b)
+		chosenLine, ok := RandomLine(localBoard)
+		if !ok {
 			return
 		}
-		p.occupiedLines = append(p.occupiedLines, (*game.TrainLine)(chosenLine))
+		slog.Info("New Train line chosen:", "Player", p.id, "Line", chosenLine)
 		chosenLine.P.(*game.TrainLineProperty).Occupy()
-		slog.Info("New Train line taken:", "Player", p.id, "Line", chosenLine)
-		// Remove edge for double route if needed
+		p.occupiedLines.AddEdge((*graph.Edge[game.City])(chosenLine))
+		p.occupiedLines.AddVertex(chosenLine.X)
+		p.occupiedLines.AddVertex(chosenLine.Y)
 		doubleLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
-			return tl.X.E == chosenLine.X.E &&
-				tl.Y.E == chosenLine.Y.E &&
-				!tl.P.(*game.TrainLineProperty).Occupied
-		}, g)
-		if doubleLine == nil {
-			return
+			return tl.X.E == chosenLine.X.E && tl.Y.E == chosenLine.Y.E && !tl.P.(*game.TrainLineProperty).Occupied
+		}, localBoard)
+		if doubleLine != nil {
+			doubleLine.P.(*game.TrainLineProperty).Occupy()
 		}
-		doubleLine.P.(*game.TrainLineProperty).Occupy()
 	}
 }
+func (p *RandomPlayer) Tickets() []game.Ticket { return nil }
 
-func (p *Random) TrainLines() []*graph.Edge[game.City] {
-	lines := make([]*graph.Edge[game.City], len(p.occupiedLines))
-	for i, l := range p.occupiedLines {
-		lines[i] = (*graph.Edge[game.City])(l)
-	}
-	return lines
-}
+func (p *RandomPlayer) TrainLines() []*graph.Edge[game.City] { return p.occupiedLines.Edges() }

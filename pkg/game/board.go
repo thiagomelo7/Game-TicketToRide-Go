@@ -93,4 +93,5 @@ type Ticket struct {
 	X, Y  City
 	Value int
 	Done  bool
+	Ok    bool
 }
