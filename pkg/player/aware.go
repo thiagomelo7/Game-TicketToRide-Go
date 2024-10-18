@@ -20,12 +20,12 @@ func NewAware(id int, t []game.Ticket) *TicketAwarePlayer {
 	return &TicketAwarePlayer{id: id, ticket: t, occupiedLines: graph.New[game.City](graph.ArcsListType, false)}
 }
 
-func (p *TicketAwarePlayer) Play() func(game.Board) {
-	rand := func(b game.Board) {
+func (p *TicketAwarePlayer) Play() func(game.Board) (game.City, game.City) {
+	rand := func(b game.Board) (game.City, game.City) {
 		localBoard := graph.Copy(b)
 		chosenLine, ok := RandomLine(localBoard)
 		if !ok {
-			return
+			return "", ""
 		}
 		slog.Info("New Train line chosen:", "Player", p.id, "Line", chosenLine)
 		chosenLine.P.(*game.TrainLineProperty).Occupy()
@@ -38,16 +38,16 @@ func (p *TicketAwarePlayer) Play() func(game.Board) {
 		if doubleLine != nil {
 			doubleLine.P.(*game.TrainLineProperty).Occupy()
 		}
+		return chosenLine.X.E, chosenLine.Y.E
 	}
 
-	graphAware := func(b game.Board) {
+	graphAware := func(b game.Board) (game.City, game.City) {
 		localBoard := graph.Copy(b)
 	updatedBoard:
 		for len(localBoard.Edges()) > 0 {
 			ticket := p.NextAvailableTicket()
 			if ticket == nil {
-				rand(localBoard)
-				return
+				return rand(localBoard)
 			}
 			tX, tY := game.FindCity(ticket.X, localBoard), game.FindCity(ticket.Y, localBoard)
 			// If there is no path between the two cities, the ticket is done and you move to the next one
@@ -90,9 +90,10 @@ func (p *TicketAwarePlayer) Play() func(game.Board) {
 					ticket.Done = true
 					ticket.Ok = true
 				}
-				return
+				return chosenLine.X.E, chosenLine.Y.E
 			}
 		}
+		return "", ""
 	}
 
 	switch p.AllTicketsDone() {
