@@ -1,37 +1,37 @@
 cx,cy,city
-110.71429,166.3802,Vancouver
-106.07143,220.30878,Seattle
-84.285713,272.45163,Portland
-240.35715,148.8802,Calgary
-70,469.23734,San Francisco
-268.92856,404.95163,Salt Lake City
-212.49998,514.95166,Las Vegas
-148.21426,573.16595,Los Angeles
-267.85712,579.95166,Phoenix
-392.14282,526.73737,Santa Fe
-386.78568,617.45166,El Paso
-548.21423,504.95166,Oklahoma City
-567.85712,593.16595,Dallas
-609.64282,632.80884,Houston
-638.21423,508.88028,Little Rock
-702.49994,621.02313,New Orleans
-799.28564,493.52313,Atlanta
-892.85706,500.66599,Charleston
-925.35706,658.52313,Miami
-748.57135,458.16599,Nashville
-864.99994,435.30884,Raleigh
-923.21423,367.80884,Washington
-831.07135,322.09454,Pittsburgh
-915.35706,277.09454,New York
-967.85706,202.09454,Boston
-814.28564,230.66597,Toronto
-896.42853,144.59454,Montreal
-704.99994,209.59454,Sault St
-700.35706,336.7374,Chicago
-568.21423,418.16595,Kansas City
-653.57135,419.95166,Saint Louis
-547.49994,367.45166,Omaha
-399.64279,436.0231,Denver
-577.14282,275.66595,Duluth
-340.71426,281.38025,Helena
-464.28571,159.95168,Winnipeg
+111,106,Vancouver
+106,160,Seattle
+84,212,Portland
+240,89,Calgary
+70,409,San Francisco
+269,345,Salt Lake City
+212,455,Las Vegas
+148,513,Los Angeles
+268,520,Phoenix
+392,467,Santa Fe
+387,557,El Paso
+548,445,Oklahoma City
+568,533,Dallas
+610,573,Houston
+638,449,Little Rock
+702,561,New Orleans
+799,434,Atlanta
+893,441,Charleston
+925,599,Miami
+749,398,Nashville
+865,375,Raleigh
+923,308,Washington
+831,262,Pittsburgh
+915,217,New York
+968,142,Boston
+814,171,Toronto
+896,85,Montreal
+705,150,Sault St. Marie
+700,277,Chicago
+568,358,Kansas City
+654,360,Saint Louis
+547,307,Omaha
+400,376,Denver
+577,216,Duluth
+341,221,Helena
+464,100,Winnipeg
