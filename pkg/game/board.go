@@ -95,3 +95,7 @@ type Ticket struct {
 	Done  bool
 	Ok    bool
 }
+
+func (t Ticket) String() string {
+	return string(t.X) + " -> " + string(t.Y) + " : " + strconv.Itoa(t.Value) + "."
+}

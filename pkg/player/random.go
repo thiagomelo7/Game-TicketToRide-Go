@@ -7,21 +7,21 @@ import (
 	"github.com/mcaci/graphgo/graph"
 )
 
-type RandomPlayer struct {
+type PseudoRandomPlayer struct {
 	id            int
 	occupiedLines game.Board
 }
 
-func NewRandom(id int) *RandomPlayer { return &RandomPlayer{id: id} }
+func NewPRPl(id int) *PseudoRandomPlayer { return &PseudoRandomPlayer{id: id} }
 
-func (p *RandomPlayer) Play() func(game.Board) {
+func (p *PseudoRandomPlayer) Play() func(game.Board) {
 	return func(b game.Board) {
 		localBoard := graph.Copy(b)
-		chosenLine, ok := RandomLine(localBoard)
+		chosenLine, ok := PseudoRandomLine(localBoard)
 		if !ok {
 			return
 		}
-		slog.Info("New Train line chosen:", "Player", p.id, "Line", chosenLine)
+		slog.Info("pseudo-random train line chosen:", "Player", p.id, "Line", chosenLine)
 		chosenLine.P.(*game.TrainLineProperty).Occupy()
 		p.occupiedLines.AddEdge((*graph.Edge[game.City])(chosenLine))
 		p.occupiedLines.AddVertex(chosenLine.X)
@@ -34,6 +34,16 @@ func (p *RandomPlayer) Play() func(game.Board) {
 		}
 	}
 }
-func (p *RandomPlayer) Tickets() []game.Ticket { return nil }
+func (p *PseudoRandomPlayer) Tickets() []game.Ticket { return nil }
 
-func (p *RandomPlayer) TrainLines() []*graph.Edge[game.City] { return p.occupiedLines.Edges() }
+func (p *PseudoRandomPlayer) TrainLines() []*graph.Edge[game.City] { return p.occupiedLines.Edges() }
+
+func PseudoRandomLine(localBoard game.Board) (*game.TrainLine, bool) {
+	chosenLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
+		return !tl.P.(*game.TrainLineProperty).Occupied
+	}, localBoard)
+	if chosenLine == nil {
+		return nil, false
+	}
+	return chosenLine, true
+}

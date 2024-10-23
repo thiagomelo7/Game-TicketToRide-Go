@@ -15,19 +15,19 @@ type TicketAwarePlayer struct {
 	ticket        []game.Ticket
 }
 
-func NewAware(id int, t []game.Ticket) *TicketAwarePlayer {
-	slog.Info("chosen tickets", "tickets", t)
+func NewTAPl(id int, t []game.Ticket) *TicketAwarePlayer {
+	slog.Info("new player:", "Player", id, "tickets", t)
 	return &TicketAwarePlayer{id: id, ticket: t, occupiedLines: graph.New[game.City](graph.ArcsListType, false)}
 }
 
 func (p *TicketAwarePlayer) Play() func(game.Board) (game.City, game.City) {
 	rand := func(b game.Board) (game.City, game.City) {
 		localBoard := graph.Copy(b)
-		chosenLine, ok := RandomLine(localBoard)
+		chosenLine, ok := PseudoRandomLine(localBoard)
 		if !ok {
 			return "", ""
 		}
-		slog.Info("New Train line chosen:", "Player", p.id, "Line", chosenLine)
+		slog.Info("pseudo-random train line choice:", "Player", p.id, "Line", chosenLine)
 		chosenLine.P.(*game.TrainLineProperty).Occupy()
 		p.occupiedLines.AddEdge((*graph.Edge[game.City])(chosenLine))
 		p.occupiedLines.AddVertex(chosenLine.X)
@@ -72,7 +72,7 @@ func (p *TicketAwarePlayer) Play() func(game.Board) (game.City, game.City) {
 					localBoard.RemoveEdge((*graph.Edge[game.City])(chosenLine))
 					continue updatedBoard
 				}
-				slog.Info("New Train line chosen:", "Player", p.id, "Line", chosenLine)
+				slog.Info("graph-aware train line choice:", "Player", p.id, "Line", chosenLine)
 				chosenLine.P.(*game.TrainLineProperty).Occupy()
 				p.occupiedLines.AddVertex(chosenLine.X)
 				p.occupiedLines.AddVertex(chosenLine.Y)
@@ -92,6 +92,9 @@ func (p *TicketAwarePlayer) Play() func(game.Board) (game.City, game.City) {
 				}
 				return chosenLine.X.E, chosenLine.Y.E
 			}
+			// If all the lines of the ticket are owned, the ticket is done
+			ticket.Done = true
+			ticket.Ok = true
 		}
 		return "", ""
 	}
@@ -102,16 +105,6 @@ func (p *TicketAwarePlayer) Play() func(game.Board) (game.City, game.City) {
 	default:
 		return rand
 	}
-}
-
-func RandomLine(localBoard game.Board) (*game.TrainLine, bool) {
-	chosenLine := game.FindLineFunc(func(tl *game.TrainLine) bool {
-		return !tl.P.(*game.TrainLineProperty).Occupied
-	}, localBoard)
-	if chosenLine == nil {
-		return nil, false
-	}
-	return chosenLine, true
 }
 
 func (p *TicketAwarePlayer) Tickets() []game.Ticket { return p.ticket }
