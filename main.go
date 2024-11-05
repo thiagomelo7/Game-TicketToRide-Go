@@ -56,10 +56,7 @@ func main() {
 	p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[ids[0]], tickets[ids[2]], tickets[ids[4]]}), player.NewTAPl(2, []game.Ticket{tickets[ids[1]], tickets[ids[3]], tickets[ids[5]]})
 	var coin bool
 	var frames []*image.Paletted
-	// careful as some lines are double so they shouold be counted as one
-	for game.FindLineFunc(func(tl *game.TrainLine) bool {
-		return !tl.P.(*game.TrainLineProperty).Occupied
-	}, routes) != nil {
+	for game.FreeRoutesAvailable(routes) {
 		var play func(game.Board) (game.City, game.City)
 		coin = !coin
 		switch coin {

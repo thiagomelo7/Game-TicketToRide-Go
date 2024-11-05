@@ -16,6 +16,12 @@ type TrainLineProperty struct {
 	Occupied bool
 }
 
+func FreeRoutesAvailable(b Board) bool {
+	return FindLineFunc(func(tl *TrainLine) bool {
+		return !tl.P.(*TrainLineProperty).Occupied
+	}, b) != nil
+}
+
 func FreeRoutesBoard(b Board) Board {
 	frb := graph.New[City](graph.ArcsListType, false)
 	for _, v := range b.Vertices() {
