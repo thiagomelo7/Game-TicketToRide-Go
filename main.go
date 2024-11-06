@@ -27,10 +27,6 @@ func main() {
 	if err != nil {
 		slog.Error("error occurred", "err", err)
 	}
-	tickets, err := data.Tickets()
-	if err != nil {
-		slog.Error("error occurred", "err", err)
-	}
 	cities, err := data.Cities()
 	if err != nil {
 		slog.Error("error occurred", "err", err)
@@ -50,10 +46,19 @@ func main() {
 		draw.Draw(layer, layer.Bounds(), src, image.Point{}, draw.Over)
 	}
 
-	// For debugging purposes, we can use the fix the tickets
-	// p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[3], tickets[26], tickets[21]}), player.NewTAPl(2, []game.Ticket{tickets[12], tickets[2], tickets[22]})
+	// Scenario 1: Random players
+	// p1, p2 := player.NewPRPl(1), player.NewPRPl(2)
+
+	// Scenario 2: Graph aware players
+	tickets, err := data.Tickets()
+	if err != nil {
+		slog.Error("error occurred", "err", err)
+	}
 	ids := rand.Perm(len(tickets))
 	p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[ids[0]], tickets[ids[2]], tickets[ids[4]]}), player.NewTAPl(2, []game.Ticket{tickets[ids[1]], tickets[ids[3]], tickets[ids[5]]})
+
+	// For debugging purposes, we can use the fix the tickets
+	// p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[3], tickets[26], tickets[21]}), player.NewTAPl(2, []game.Ticket{tickets[12], tickets[2], tickets[22]})
 	var coin bool
 	var frames []*image.Paletted
 	for game.FreeRoutesAvailable(routes) {

@@ -12,16 +12,18 @@ type PseudoRandomPlayer struct {
 	occupiedLines game.Board
 }
 
-func NewPRPl(id int) *PseudoRandomPlayer { return &PseudoRandomPlayer{id: id} }
+func NewPRPl(id int) *PseudoRandomPlayer {
+	return &PseudoRandomPlayer{id: id, occupiedLines: graph.New[game.City](graph.ArcsListType, false)}
+}
 
-func (p *PseudoRandomPlayer) Play() func(game.Board) {
-	return func(b game.Board) {
+func (p *PseudoRandomPlayer) Play() func(game.Board) (game.City, game.City) {
+	return func(b game.Board) (game.City, game.City) {
 		localBoard := graph.Copy(b)
 		chosenLine, ok := PseudoRandomLine(localBoard)
 		if !ok {
-			return
+			return "", ""
 		}
-		slog.Info("pseudo-random train line chosen:", "Player", p.id, "Line", chosenLine)
+		slog.Info("pseudo-random train line choice:", "Player", p.id, "Line", chosenLine)
 		chosenLine.P.(*game.TrainLineProperty).Occupy()
 		p.occupiedLines.AddEdge((*graph.Edge[game.City])(chosenLine))
 		p.occupiedLines.AddVertex(chosenLine.X)
@@ -32,6 +34,7 @@ func (p *PseudoRandomPlayer) Play() func(game.Board) {
 		if doubleLine != nil {
 			doubleLine.P.(*game.TrainLineProperty).Occupy()
 		}
+		return chosenLine.X.E, chosenLine.Y.E
 	}
 }
 func (p *PseudoRandomPlayer) Tickets() []game.Ticket { return nil }
