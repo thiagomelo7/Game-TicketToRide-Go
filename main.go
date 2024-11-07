@@ -12,7 +12,6 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"log/slog"
-	"math/rand/v2"
 	"os"
 	"slices"
 
@@ -54,8 +53,7 @@ func main() {
 	if err != nil {
 		slog.Error("error occurred", "err", err)
 	}
-	ids := rand.Perm(len(tickets))
-	p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[ids[0]], tickets[ids[2]], tickets[ids[4]]}), player.NewTAPl(2, []game.Ticket{tickets[ids[1]], tickets[ids[3]], tickets[ids[5]]})
+	p1, p2 := player.NewWithTickets(1, game.GetTickets(3, &tickets)), player.NewWithTickets(2, game.GetTickets(3, &tickets))
 
 	// For debugging purposes, we can use the fix the tickets
 	// p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[3], tickets[26], tickets[21]}), player.NewTAPl(2, []game.Ticket{tickets[12], tickets[2], tickets[22]})

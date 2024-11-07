@@ -1,6 +1,7 @@
 package game
 
 import (
+	"math/rand/v2"
 	"strconv"
 
 	"github.com/mcaci/graphgo/graph"
@@ -104,4 +105,15 @@ type Ticket struct {
 
 func (t Ticket) String() string {
 	return string(t.X) + " -> " + string(t.Y) + " : " + strconv.Itoa(t.Value) + "."
+}
+
+func GetTickets(n int, tickets *[]Ticket) []Ticket {
+	t := *tickets
+	ids := rand.Perm(len(t))
+	for i := 0; i < n; i++ {
+		t[ids[i]], t[i] = t[i], t[ids[i]]
+	}
+	var ticketsToReturn []Ticket
+	ticketsToReturn, *tickets = t[:n], t[n:]
+	return ticketsToReturn
 }
