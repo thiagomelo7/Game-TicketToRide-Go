@@ -73,7 +73,7 @@ func (p *WithTickets) Play() func(game.Board) (game.City, game.City) {
 					localBoard.RemoveEdge(chosenLineEdge)
 					continue updatedBoard
 				}
-				slog.Info("graph-aware train line choice:", "Player", p.id, "Line", chosenLine)
+				slog.Info("train line choice using shortest path:", "Player", p.id, "Line", chosenLine)
 				chosenLine.P.(*game.TrainLineProperty).Occupy()
 				p.ownedLines.AddVertex(chosenLine.X)
 				p.ownedLines.AddVertex(chosenLine.Y)

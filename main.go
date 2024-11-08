@@ -46,14 +46,14 @@ func main() {
 	}
 
 	// Scenario 1: Random players
-	// p1, p2 := player.NewPRPl(1), player.NewPRPl(2)
+	p1, p2 := player.NewRandom(1), player.NewRandom(2)
 
 	// Scenario 2: Graph aware players
-	tickets, err := data.Tickets()
-	if err != nil {
-		slog.Error("error occurred", "err", err)
-	}
-	p1, p2 := player.NewWithTickets(1, game.GetTickets(3, &tickets)), player.NewWithTickets(2, game.GetTickets(3, &tickets))
+	// tickets, err := data.Tickets()
+	// if err != nil {
+	// 	slog.Error("error occurred", "err", err)
+	// }
+	// p1, p2 := player.NewWithTickets(1, game.GetTickets(3, &tickets)), player.NewWithTickets(2, game.GetTickets(3, &tickets))
 
 	// For debugging purposes, we can use the fix the tickets
 	// p1, p2 := player.NewTAPl(1, []game.Ticket{tickets[3], tickets[26], tickets[21]}), player.NewTAPl(2, []game.Ticket{tickets[12], tickets[2], tickets[22]})
