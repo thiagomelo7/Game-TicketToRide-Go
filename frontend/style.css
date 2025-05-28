@@ -1,0 +1,33 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+  margin: 0;
+  padding: 20px;
+}
+
+#map-container {
+  position: relative;
+  width: 1024px;
+  height: 683px;
+  margin-top: 20px;
+}
+#map-img {
+  width: 1024px;
+  height: 683px;
+  display: block;
+}
+#map-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1024px;
+  height: 683px; 
+}
+
+#game-info {
+  margin-top: 20px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  min-height: 60px;
+}

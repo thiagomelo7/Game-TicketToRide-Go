@@ -12,9 +12,10 @@ type City string
 type TrainStation graph.Vertex[City]
 type TrainLine graph.Edge[City]
 type TrainLineProperty struct {
-	Distance int
-	Color    Color
-	Occupied bool
+	Distance   int
+	Color      Color
+	Occupied   bool
+	OccupiedBy string
 }
 
 func FreeRoutesAvailable(b Board) bool {
@@ -49,11 +50,11 @@ func FindCity(name City, in Board) *TrainStation {
 
 func FindLineFunc(f func(*TrainLine) bool, in Board) *TrainLine {
 	for _, e := range in.Edges() {
-		tl := (*TrainLine)(e)
-		if !f(tl) {
+		tl := TrainLine(*e)
+		if !f(&tl) {
 			continue
 		}
-		return tl
+		return &tl
 	}
 	return nil
 }
@@ -84,7 +85,7 @@ type Card Color
 
 var availableTrainCars int = 40
 
-var totalCards = map[Color]int{
+var TotalCards = map[Color]int{
 	All:    14,
 	Blue:   12,
 	Red:    12,

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ticket to Ride - USA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Ticket to Ride - USA</h1>
+  <button id="create-game">Criar nova partida</button>
+  <button id="buy-train-card">Comprar carta de trem</button>
+  <button id="swap-ticket">Trocar Ticket de Destino</button>
+  <div id="bot-message"></div>
+  <div id="game-info"></div>
+ <div id="map-container" style="position: relative;">
+  <img id="map-img" src="assets/USA_map.jpg" alt="Mapa USA" style="width: 1024px; height: 683px;">
+  <canvas id="map-canvas" width="1024" height="683" style="position: absolute; left: 0; top: 0;"></canvas>
+</div>
+
+  <script type="module" src="cidades.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

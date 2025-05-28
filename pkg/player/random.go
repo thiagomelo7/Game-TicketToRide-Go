@@ -8,7 +8,7 @@ import (
 )
 
 type Random struct {
-	id            int
+	id    int
 	owned game.Board
 }
 
